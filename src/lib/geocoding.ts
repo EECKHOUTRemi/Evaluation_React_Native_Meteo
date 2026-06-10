@@ -1,3 +1,5 @@
+import type { Coordinates } from '@/lib/location';
+
 export type CityResult = {
   id: number;
   name: string;
@@ -50,4 +52,22 @@ export async function searchCities(query: string): Promise<CityResult[]> {
     country: result.country ?? null,
     region: result.admin1 ?? null,
   }));
+}
+
+/**
+ * Resolves a city name to its canonical geocoding entry, picking the match
+ * closest to the given coordinates (several cities can share a name).
+ *
+ * Returns null when nothing matches.
+ */
+export async function findNearestCity(name: string, near: Coordinates): Promise<CityResult | null> {
+  const results = await searchCities(name);
+  if (results.length === 0) {
+    return null;
+  }
+
+  const distance2 = (city: CityResult) =>
+    (city.latitude - near.latitude) ** 2 + (city.longitude - near.longitude) ** 2;
+
+  return results.reduce((best, city) => (distance2(city) < distance2(best) ? city : best));
 }

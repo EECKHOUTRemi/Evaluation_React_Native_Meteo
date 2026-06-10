@@ -7,13 +7,14 @@ import { CitySearch } from '@/components/city-search';
 import { CurrentWeatherCard } from '@/components/current-weather-card';
 import { FavoriteCityCard } from '@/components/favorite-city-card';
 import { getFavorites, type FavoriteCity } from '@/lib/favorites';
-import type { CityResult } from '@/lib/geocoding';
-import { getCurrentCoordinates, getPlace, type Place } from '@/lib/location';
+import { findNearestCity, type CityResult } from '@/lib/geocoding';
+import { coordinatesId, getCurrentCoordinates, getPlace, type Place } from '@/lib/location';
 import { getHomeWeather, type HomeWeather } from '@/lib/weather';
 import { theme } from '@/theme';
 
 export default function Index() {
   const [place, setPlace] = useState<Place | null>(null);
+  const [myCity, setMyCity] = useState<CityResult | null>(null);
   const [weather, setWeather] = useState<HomeWeather | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -29,15 +30,32 @@ export default function Index() {
     setLoading(true);
     setError(null);
     try {
-      const coords = await getCurrentCoordinates();
-      const [resolvedPlace, forecast] = await Promise.all([
-        getPlace(coords),
-        getHomeWeather(coords),
-      ]);
+      const position = await getCurrentCoordinates();
+      const resolvedPlace = await getPlace(position);
+
+      // Resolve the position to the canonical geocoding city so the weather
+      // matches what a search for the same city returns. Falls back to the
+      // raw GPS point when the city cannot be resolved.
+      let city: CityResult | null = null;
+      if (resolvedPlace.city) {
+        city = await findNearestCity(resolvedPlace.city, position).catch(() => null);
+      }
+      const resolvedCity: CityResult = city ?? {
+        id: coordinatesId(position),
+        name: resolvedPlace.city ?? 'Ma position',
+        country: resolvedPlace.country,
+        region: resolvedPlace.region,
+        latitude: position.latitude,
+        longitude: position.longitude,
+      };
+
+      const forecast = await getHomeWeather(resolvedCity);
+      setMyCity(resolvedCity);
       setPlace(resolvedPlace);
       setWeather(forecast);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Impossible de charger la météo.');
+      setMyCity(null);
       setPlace(null);
       setWeather(null);
     } finally {
@@ -97,7 +115,11 @@ export default function Index() {
         )}
 
         {weather && !loading && (
-          <CurrentWeatherCard placeName={placeName} weather={weather} />
+          <CurrentWeatherCard
+            placeName={placeName}
+            weather={weather}
+            onPress={myCity ? () => openCity(myCity) : undefined}
+          />
         )}
 
         <View style={styles.favoritesSection}>

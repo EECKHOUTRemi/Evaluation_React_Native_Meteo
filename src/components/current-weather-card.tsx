@@ -1,5 +1,5 @@
 import { MapPin } from 'lucide-react-native';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { formatUpdatedAt } from '@/lib/format';
 import { describeWeather } from '@/lib/weather-codes';
@@ -9,9 +9,10 @@ import { theme } from '@/theme';
 type CurrentWeatherCardProps = {
   placeName: string;
   weather: HomeWeather;
+  onPress?: () => void;
 };
 
-export function CurrentWeatherCard({ placeName, weather }: CurrentWeatherCardProps) {
+export function CurrentWeatherCard({ placeName, weather, onPress }: CurrentWeatherCardProps) {
   const { current, current_units, daily } = weather;
   const { label, icon: WeatherIcon, color: iconColor } = describeWeather(current.weather_code);
 
@@ -20,7 +21,10 @@ export function CurrentWeatherCard({ placeName, weather }: CurrentWeatherCardPro
   const min = Math.round(daily.temperature_2m_min[0]);
 
   return (
-    <View style={styles.card}>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.card, pressed && onPress && styles.cardPressed]}
+    >
       <View style={styles.header}>
         <View style={styles.pinRow}>
           <MapPin size={14} color={theme.colors.muted} />
@@ -50,7 +54,7 @@ export function CurrentWeatherCard({ placeName, weather }: CurrentWeatherCardPro
           Dernière mise à jour : {formatUpdatedAt(current.time)}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -60,6 +64,9 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     padding: theme.spacing.lg,
     gap: theme.spacing.md,
+  },
+  cardPressed: {
+    backgroundColor: theme.colors.card,
   },
   header: {
     gap: 2,

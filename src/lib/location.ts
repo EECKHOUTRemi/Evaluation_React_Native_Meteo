@@ -35,6 +35,16 @@ export type Place = {
 };
 
 /**
+ * Derives a stable numeric id from coordinates (~1km grid), used to key the
+ * current position in favorites since it has no geocoding id. The latitude
+ * part is spaced 100000 apart while the longitude part stays within ±18000,
+ * so two different grid cells can never produce the same id.
+ */
+export function coordinatesId({ latitude, longitude }: Coordinates): number {
+  return Math.round(latitude * 100) * 100000 + Math.round(longitude * 100);
+}
+
+/**
  * Reverse-geocodes coordinates into a place (city, region, country).
  *
  * Uses a free HTTP reverse-geocoder so it works on every platform (including
