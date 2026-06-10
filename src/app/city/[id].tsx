@@ -18,8 +18,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { isFavorite, toggleFavorite } from '@/lib/favorites';
 import { formatHour, formatUpdatedAt, windDirectionLabel } from '@/lib/format';
-import { describeWeather } from '@/lib/weather-codes';
-import { getWeather, type WeatherResponse } from '@/lib/weather';
+import { getWeather, type WeatherResponse } from '@/lib/weather/weather';
+import { describeWeather } from '@/lib/weather/weather-codes';
 import { theme } from '@/theme';
 
 function DetailRow({

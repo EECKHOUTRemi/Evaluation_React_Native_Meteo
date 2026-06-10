@@ -1,4 +1,4 @@
-import type { Coordinates } from '@/lib/location';
+import type { Coordinates } from '@/lib/location/location';
 
 export type CurrentWeather = {
   time: string;

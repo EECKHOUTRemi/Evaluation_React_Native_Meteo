@@ -1,4 +1,4 @@
-import type { Coordinates } from '@/lib/location';
+import type { Coordinates } from '@/lib/location/location';
 
 export type CityResult = {
   id: number;
@@ -23,7 +23,7 @@ type GeocodingResponse = {
 /**
  * Searches cities by name using the Open-Meteo geocoding API.
  *
- * Returns an empty array when nothing matches or the query is too short.
+ * @returns an empty array when nothing matches or the query is too short.
  */
 export async function searchCities(query: string): Promise<CityResult[]> {
   const trimmed = query.trim();
@@ -58,7 +58,7 @@ export async function searchCities(query: string): Promise<CityResult[]> {
  * Resolves a city name to its canonical geocoding entry, picking the match
  * closest to the given coordinates (several cities can share a name).
  *
- * Returns null when nothing matches.
+ * @returns null when nothing matches.
  */
 export async function findNearestCity(name: string, near: Coordinates): Promise<CityResult | null> {
   const results = await searchCities(name);

@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { FavoriteCity } from '@/lib/favorites';
-import { describeWeather } from '@/lib/weather-codes';
-import { getHomeWeather, type HomeWeather } from '@/lib/weather';
+import { getHomeWeather, type HomeWeather } from '@/lib/weather/weather';
+import { describeWeather } from '@/lib/weather/weather-codes';
 import { theme } from '@/theme';
 
 type FavoriteCityCardProps = {

@@ -6,7 +6,7 @@ export type Coordinates = {
 };
 
 /**
- * Requests foreground location permission and returns the device's current
+ * Requests location permission and returns the device's current
  * latitude and longitude.
  *
  * @throws if the user denies the location permission.
@@ -18,8 +18,6 @@ export async function getCurrentCoordinates(): Promise<Coordinates> {
     throw new Error('Veuillez autoriser l\'accès à votre localisation.');
   }
 
-  // A recent cached fix is returned instantly and is plenty accurate for
-  // city-level weather; only wait for a fresh GPS fix when none is available.
   const lastKnown = await Location.getLastKnownPositionAsync({ maxAge: 5 * 60 * 1000 });
   const coords =
     lastKnown?.coords ??
@@ -38,10 +36,7 @@ export type Place = {
 };
 
 /**
- * Derives a stable numeric id from coordinates (~1km grid), used to key the
- * current position in favorites since it has no geocoding id. The latitude
- * part is spaced 100000 apart while the longitude part stays within ±18000,
- * so two different grid cells can never produce the same id.
+ * Create an unique id for a city from their coordinates
  */
 export function coordinatesId({ latitude, longitude }: Coordinates): number {
   return Math.round(latitude * 100) * 100000 + Math.round(longitude * 100);
@@ -49,9 +44,6 @@ export function coordinatesId({ latitude, longitude }: Coordinates): number {
 
 /**
  * Reverse-geocodes coordinates into a place (city, region, country).
- *
- * Uses a free HTTP reverse-geocoder so it works on every platform (including
- * web, where `expo-location`'s native reverse geocoding is unavailable).
  */
 export async function getPlace({ latitude, longitude }: Coordinates): Promise<Place> {
   const url = new URL('https://api.bigdatacloud.net/data/reverse-geocode-client');
@@ -74,8 +66,7 @@ export async function getPlace({ latitude, longitude }: Coordinates): Promise<Pl
   return {
     city: data.city || data.locality || null,
     region: data.principalSubdivision || null,
-    // The French ISO country name carries its article in parentheses,
-    // e.g. "France (la)" — strip it for display.
+    // Remove the parenthesis from country name
     country: data.countryName?.replace(/\s*\([^)]*\)\s*$/, '') || null,
   };
 }

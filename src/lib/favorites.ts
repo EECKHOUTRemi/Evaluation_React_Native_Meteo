@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import type { CityResult } from '@/lib/geocoding';
+import type { CityResult } from '@/lib/location/geocoding';
 
 const STORAGE_KEY = 'favorite-cities';
 

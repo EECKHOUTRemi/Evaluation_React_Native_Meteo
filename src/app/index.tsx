@@ -7,10 +7,10 @@ import { CitySearch } from '@/components/city-search';
 import { CurrentWeatherCard } from '@/components/current-weather-card';
 import { FavoriteCityCard } from '@/components/favorite-city-card';
 import { getFavorites, type FavoriteCity } from '@/lib/favorites';
-import { type CityResult } from '@/lib/geocoding';
-import { getCurrentCoordinates, type Place } from '@/lib/location';
-import { resolveMyCity } from '@/lib/my-city';
-import { getHomeWeather, type HomeWeather } from '@/lib/weather';
+import { type CityResult } from '@/lib/location/geocoding';
+import { getCurrentCoordinates, type Place } from '@/lib/location/location';
+import { resolveMyCity } from '@/lib/location/my-city';
+import { getHomeWeather, type HomeWeather } from '@/lib/weather/weather';
 import { theme } from '@/theme';
 
 export default function Index() {

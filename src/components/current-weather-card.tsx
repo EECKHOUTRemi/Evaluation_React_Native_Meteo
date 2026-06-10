@@ -2,8 +2,8 @@ import { MapPin } from 'lucide-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { formatUpdatedAt } from '@/lib/format';
-import { describeWeather } from '@/lib/weather-codes';
-import type { HomeWeather } from '@/lib/weather';
+import type { HomeWeather } from '@/lib/weather/weather';
+import { describeWeather } from '@/lib/weather/weather-codes';
 import { theme } from '@/theme';
 
 type CurrentWeatherCardProps = {

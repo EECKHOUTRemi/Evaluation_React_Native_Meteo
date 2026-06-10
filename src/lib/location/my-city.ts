@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { findNearestCity, type CityResult } from '@/lib/geocoding';
-import { coordinatesId, getPlace, type Coordinates, type Place } from '@/lib/location';
+import { findNearestCity, type CityResult } from '@/lib/location/geocoding';
+import { coordinatesId, getPlace, type Coordinates, type Place } from '@/lib/location/location';
 
 const STORAGE_KEY = 'my-city-cache';
 

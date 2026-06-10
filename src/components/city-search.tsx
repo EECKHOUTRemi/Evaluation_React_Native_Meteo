@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { SearchBar } from '@/components/search-bar';
-import { searchCities, type CityResult } from '@/lib/geocoding';
+import { searchCities, type CityResult } from '@/lib/location/geocoding';
 import { theme } from '@/theme';
 
 type CitySearchProps = {
