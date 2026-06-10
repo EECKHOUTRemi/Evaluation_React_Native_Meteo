@@ -18,9 +18,12 @@ export async function getCurrentCoordinates(): Promise<Coordinates> {
     throw new Error('Veuillez autoriser l\'accès à votre localisation.');
   }
 
-  const { coords } = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.Balanced,
-  });
+  // A recent cached fix is returned instantly and is plenty accurate for
+  // city-level weather; only wait for a fresh GPS fix when none is available.
+  const lastKnown = await Location.getLastKnownPositionAsync({ maxAge: 5 * 60 * 1000 });
+  const coords =
+    lastKnown?.coords ??
+    (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords;
 
   return {
     latitude: coords.latitude,

@@ -7,8 +7,9 @@ import { CitySearch } from '@/components/city-search';
 import { CurrentWeatherCard } from '@/components/current-weather-card';
 import { FavoriteCityCard } from '@/components/favorite-city-card';
 import { getFavorites, type FavoriteCity } from '@/lib/favorites';
-import { findNearestCity, type CityResult } from '@/lib/geocoding';
-import { coordinatesId, getCurrentCoordinates, getPlace, type Place } from '@/lib/location';
+import { type CityResult } from '@/lib/geocoding';
+import { getCurrentCoordinates, type Place } from '@/lib/location';
+import { resolveMyCity } from '@/lib/my-city';
 import { getHomeWeather, type HomeWeather } from '@/lib/weather';
 import { theme } from '@/theme';
 
@@ -31,24 +32,7 @@ export default function Index() {
     setError(null);
     try {
       const position = await getCurrentCoordinates();
-      const resolvedPlace = await getPlace(position);
-
-      // Resolve the position to the canonical geocoding city so the weather
-      // matches what a search for the same city returns. Falls back to the
-      // raw GPS point when the city cannot be resolved.
-      let city: CityResult | null = null;
-      if (resolvedPlace.city) {
-        city = await findNearestCity(resolvedPlace.city, position).catch(() => null);
-      }
-      const resolvedCity: CityResult = city ?? {
-        id: coordinatesId(position),
-        name: resolvedPlace.city ?? 'Ma position',
-        country: resolvedPlace.country,
-        region: resolvedPlace.region,
-        latitude: position.latitude,
-        longitude: position.longitude,
-      };
-
+      const { place: resolvedPlace, city: resolvedCity } = await resolveMyCity(position);
       const forecast = await getHomeWeather(resolvedCity);
       setMyCity(resolvedCity);
       setPlace(resolvedPlace);
