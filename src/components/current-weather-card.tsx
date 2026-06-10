@@ -1,5 +1,7 @@
+import { MapPin } from 'lucide-react-native';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { formatUpdatedAt } from '@/lib/format';
 import { describeWeather } from '@/lib/weather-codes';
 import type { HomeWeather } from '@/lib/weather';
 import { theme } from '@/theme';
@@ -9,34 +11,9 @@ type CurrentWeatherCardProps = {
   weather: HomeWeather;
 };
 
-/**
- * Formats an Open-Meteo local timestamp ("2026-06-10T10:30") as
- * "Aujourd'hui 10:30" when the date is today, "10/06/2026 10:30" otherwise.
- */
-function formatUpdatedAt(isoTime: string): string {
-  const [date, time] = isoTime.split('T');
-  if (!time) {
-    return isoTime;
-  }
-
-  const now = new Date();
-  const today = [
-    now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, '0'),
-    String(now.getDate()).padStart(2, '0'),
-  ].join('-');
-
-  if (date === today) {
-    return `Aujourd'hui ${time}`;
-  }
-
-  const [year, month, day] = date.split('-');
-  return `${day}/${month}/${year} ${time}`;
-}
-
 export function CurrentWeatherCard({ placeName, weather }: CurrentWeatherCardProps) {
   const { current, current_units, daily } = weather;
-  const { label, icon } = describeWeather(current.weather_code);
+  const { label, icon: WeatherIcon, color: iconColor } = describeWeather(current.weather_code);
 
   const tempUnit = current_units.temperature_2m;
   const max = Math.round(daily.temperature_2m_max[0]);
@@ -45,7 +22,10 @@ export function CurrentWeatherCard({ placeName, weather }: CurrentWeatherCardPro
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.pin}>📍 Ma position</Text>
+        <View style={styles.pinRow}>
+          <MapPin size={14} color={theme.colors.muted} />
+          <Text style={styles.pin}>Ma position</Text>
+        </View>
         <Text style={styles.place}>{placeName}</Text>
       </View>
 
@@ -59,7 +39,7 @@ export function CurrentWeatherCard({ placeName, weather }: CurrentWeatherCardPro
             Ressenti : {Math.round(current.apparent_temperature)}°
           </Text>
         </View>
-        <Text style={styles.icon}>{icon}</Text>
+        <WeatherIcon size={64} color={iconColor} strokeWidth={1.5} />
       </View>
 
       <View style={styles.footer}>
@@ -83,6 +63,11 @@ const styles = StyleSheet.create({
   },
   header: {
     gap: 2,
+  },
+  pinRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
   },
   pin: {
     color: theme.colors.muted,
@@ -114,9 +99,6 @@ const styles = StyleSheet.create({
   feels: {
     color: theme.colors.muted,
     fontSize: 13,
-  },
-  icon: {
-    fontSize: 64,
   },
   footer: {
     borderTopWidth: 1,

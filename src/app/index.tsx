@@ -1,10 +1,12 @@
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CitySearch } from '@/components/city-search';
 import { CurrentWeatherCard } from '@/components/current-weather-card';
+import { FavoriteCityCard } from '@/components/favorite-city-card';
+import { getFavorites, type FavoriteCity } from '@/lib/favorites';
 import type { CityResult } from '@/lib/geocoding';
 import { getCurrentCoordinates, getPlace, type Place } from '@/lib/location';
 import { getHomeWeather, type HomeWeather } from '@/lib/weather';
@@ -15,6 +17,13 @@ export default function Index() {
   const [weather, setWeather] = useState<HomeWeather | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [favorites, setFavorites] = useState<FavoriteCity[]>([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      getFavorites().then(setFavorites);
+    }, [])
+  );
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -52,6 +61,7 @@ export default function Index() {
         id: String(city.id),
         name: city.name,
         country: city.country ?? '',
+        region: city.region ?? '',
         latitude: String(city.latitude),
         longitude: String(city.longitude),
       },
@@ -92,14 +102,22 @@ export default function Index() {
 
         <View style={styles.favoritesSection}>
           <Text style={styles.sectionTitle}>VILLES FAVORITES</Text>
-          <View style={styles.emptyCard}>
-            <Text style={styles.emptyText}>
-              Aucune ville favorite pour le moment.
-            </Text>
-            <Text style={styles.emptyHint}>
-              Recherchez une ville pour l&apos;ajouter à vos favoris.
-            </Text>
-          </View>
+          {favorites.length === 0 ? (
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyText}>
+                Aucune ville favorite pour le moment.
+              </Text>
+              <Text style={styles.emptyHint}>
+                Recherchez une ville pour l&apos;ajouter à vos favoris.
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.favoritesGrid}>
+              {favorites.map((city) => (
+                <FavoriteCityCard key={city.id} city={city} onPress={openCity} />
+              ))}
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -153,6 +171,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   favoritesSection: {
+    gap: theme.spacing.md,
+  },
+  favoritesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: theme.spacing.md,
   },
   sectionTitle: {

@@ -1,3 +1,4 @@
+import { Search } from 'lucide-react-native';
 import { StyleSheet, TextInput, View } from 'react-native';
 
 import { theme } from '@/theme';
@@ -12,6 +13,7 @@ type SearchBarProps = {
 export function SearchBar({ value, onChangeText, onSubmit, placeholder }: SearchBarProps) {
   return (
     <View style={styles.container}>
+      <Search size={18} color={theme.colors.muted} />
       <TextInput
         value={value}
         onChangeText={onChangeText}
@@ -34,11 +36,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     paddingHorizontal: theme.spacing.md,
+    gap: theme.spacing.sm,
   },
   input: {
     flex: 1,
     color: theme.colors.text,
     fontSize: 16,
     paddingVertical: theme.spacing.md,
+    ...({ outlineStyle: 'none' } as any)
   },
 });
