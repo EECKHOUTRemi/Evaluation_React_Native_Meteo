@@ -15,7 +15,7 @@ export async function getCurrentCoordinates(): Promise<Coordinates> {
   const { status } = await Location.requestForegroundPermissionsAsync();
 
   if (status !== Location.PermissionStatus.GRANTED) {
-    throw new Error('Location permission was not granted.');
+    throw new Error('Veuillez autoriser l\'accès à votre localisation.');
   }
 
   const { coords } = await Location.getCurrentPositionAsync({
