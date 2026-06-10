@@ -7,12 +7,12 @@ import { CitySearch } from '@/components/city-search';
 import { CurrentWeatherCard } from '@/components/current-weather-card';
 import type { CityResult } from '@/lib/geocoding';
 import { getCurrentCoordinates, getPlace, type Place } from '@/lib/location';
-import { getWeather, type WeatherResponse } from '@/lib/weather';
+import { getHomeWeather, type HomeWeather } from '@/lib/weather';
 import { theme } from '@/theme';
 
 export default function Index() {
   const [place, setPlace] = useState<Place | null>(null);
-  const [weather, setWeather] = useState<WeatherResponse | null>(null);
+  const [weather, setWeather] = useState<HomeWeather | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +23,7 @@ export default function Index() {
       const coords = await getCurrentCoordinates();
       const [resolvedPlace, forecast] = await Promise.all([
         getPlace(coords),
-        getWeather(coords),
+        getHomeWeather(coords),
       ]);
       setPlace(resolvedPlace);
       setWeather(forecast);

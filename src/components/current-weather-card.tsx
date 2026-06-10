@@ -1,13 +1,38 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { describeWeather } from '@/lib/weather-codes';
-import type { WeatherResponse } from '@/lib/weather';
+import type { HomeWeather } from '@/lib/weather';
 import { theme } from '@/theme';
 
 type CurrentWeatherCardProps = {
   placeName: string;
-  weather: WeatherResponse;
+  weather: HomeWeather;
 };
+
+/**
+ * Formats an Open-Meteo local timestamp ("2026-06-10T10:30") as
+ * "Aujourd'hui 10:30" when the date is today, "10/06/2026 10:30" otherwise.
+ */
+function formatUpdatedAt(isoTime: string): string {
+  const [date, time] = isoTime.split('T');
+  if (!time) {
+    return isoTime;
+  }
+
+  const now = new Date();
+  const today = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
+  ].join('-');
+
+  if (date === today) {
+    return `Aujourd'hui ${time}`;
+  }
+
+  const [year, month, day] = date.split('-');
+  return `${day}/${month}/${year} ${time}`;
+}
 
 export function CurrentWeatherCard({ placeName, weather }: CurrentWeatherCardProps) {
   const { current, current_units, daily } = weather;
@@ -40,6 +65,9 @@ export function CurrentWeatherCard({ placeName, weather }: CurrentWeatherCardPro
       <View style={styles.footer}>
         <Text style={styles.minMax}>
           Min {min}{tempUnit}   |   Max {max}{tempUnit}
+        </Text>
+        <Text style={styles.updatedAt}>
+          Dernière mise à jour : {formatUpdatedAt(current.time)}
         </Text>
       </View>
     </View>
@@ -98,5 +126,10 @@ const styles = StyleSheet.create({
   minMax: {
     color: theme.colors.muted,
     fontSize: 13,
+  },
+  updatedAt: {
+    color: theme.colors.muted,
+    fontSize: 12,
+    marginTop: theme.spacing.xs,
   },
 });

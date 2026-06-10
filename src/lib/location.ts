@@ -61,6 +61,8 @@ export async function getPlace({ latitude, longitude }: Coordinates): Promise<Pl
   return {
     city: data.city || data.locality || null,
     region: data.principalSubdivision || null,
-    country: data.countryName || null,
+    // The French ISO country name carries its article in parentheses,
+    // e.g. "France (la)" — strip it for display.
+    country: data.countryName?.replace(/\s*\([^)]*\)\s*$/, '') || null,
   };
 }
